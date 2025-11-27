@@ -1,32 +1,29 @@
 clear; clc; close all;
 
-workspace = [0,2*(sqrt(2))];
 
 % Robot link lengths
 L1 = 2*(sqrt(2));
 L2 = 2*(sqrt(2));
 L3 = 0.5;
-dx = 0.5;
-dy = 0.5;
-dz = 0.5;
-New_dx = 4;
-New_dy = 4;
+dx = 2.5;
+dy = 2.5;
+dz = 2.5;
+New_dx = 4.5;
+New_dy = 0;
 New_dz = 4;
+simulate = 1;
+ro = 0;
 %recomendation workspace
 % 0.5 < dx < 4.5
 % 0.5 < dy < 4
 % 0.5 < dz < 4
 % ส่วนstatic ดูแรง
-Fx =0;
-Fy =0;
+Fx =10;
+Fy =10;
 Fz =10;
-
-Mx = 0;
-My = 0;
-Mz = 0;
-
-W = [Fx; Fy; Fz; Mx; My; Mz];
 F = [Fx; Fy; Fz];
+t = linspace(0, 6, 300);
+
 PZ3 = zeros(3,300);
 PY3 = zeros(3,300);
 PX3 = zeros(3,300);
@@ -37,7 +34,7 @@ F_scale = 0.3;
 % new_center = [New_dx,New_dy,New_dz];
 % Time vector
 
-t = linspace(0, 6, 300);
+
 DZ = ((New_dz -dz)*t/6)+dz;
 DX = ((New_dx -dx)*t/6)+dx;
 DY = ((New_dy -dy)*t/6)+dy;
@@ -61,8 +58,8 @@ for i = 1:length(t)
     thetaX2 = q2x;
     thetaX3 = q3x;
 
-    q2y(i)  = Invertq2(L1,L2,L3,DZ(i),DX(i),0);
-    q1y(i)  = Invertq1(L1,L2,L3,DZ(i),DX(i),q2y(i) ,0);
+    q2y(i)  = Invertq2(L1,L2,L3,DX(i),DZ(i),0);
+    q1y(i)  = Invertq1(L1,L2,L3,DX(i),DZ(i),q2y(i) ,0);
     q3y(i)  = Invertq3(q1y(i) ,q2y(i) ,0);
     thetaY1 = q1y;
     thetaY2 = q2y;
@@ -81,6 +78,7 @@ qy = [rad2deg(q1y(1)),rad2deg(q1y(300)),rad2deg(q2y(1)),rad2deg(q2y(300)),rad2de
 qz = [rad2deg(q1z(1)),rad2deg(q1z(300)),rad2deg(q2z(1)),rad2deg(q2z(300)),rad2deg(q3z(1)),rad2deg(q3z(300))];
 
 % Setup figure
+if simulate == 1
 figure('Color','white');
 hold on; grid on; axis equal;
 xlabel('Z'); ylabel('X'); zlabel('Y');
@@ -91,12 +89,7 @@ xlim([-2*(sqrt(2)) 6]); ylim([-2*(sqrt(2)) 6+2*(sqrt(2))]); zlim([-2*(sqrt(2)) 6
 view(90,0);   % 3D camera angle
 
 trace = animatedline('Color','m','LineWidth',1.5);
-% 
-% % ===== force pointer =====
-% EE_now = [0 0 0];
-% F_arrow = quiver3(EE_now(1),EE_now(2),EE_now(3), ...
-%                   0,0,0, 'LineWidth',2,'Color','r','MaxHeadSize',2);
-% 
+end
 for k = 1:length(t)
 
   %DH parameter
@@ -145,6 +138,7 @@ for k = 1:length(t)
     PX3(:,k) = pX3;
     PY3(:,k) = pY3;
 
+if simulate == 1
      cla;
      % Draw robot links (thick 3D lines)
     plot3([0 0], [0 0], [0 5], 'k', 'LineWidth',2);
@@ -181,23 +175,12 @@ for k = 1:length(t)
     scatter3(pZ3(3), pZ3(1), pZ3(2), 80, 'filled','b');
     scatter3(pZ4(3), pZ4(1), pZ4(2), 120, 'filled', 'y');
 
-
-    % ===== pointer force yello =====
-    % EE_now = (pZ3 + pX3 + pY3) / 3;
-    % 
-    % ForceTip = EE_now + F_scale * F;     % ปลายแท่งแรง
-    % 
-    % plot3([EE_now(1) ForceTip(1)], ...
-    %       [EE_now(2) ForceTip(2)], ...
-    %       [EE_now(3) ForceTip(3)], ...
-    %       'Color','y','LineWidth',3);
-
-
-
-
-    camorbit(0.3, 0);
+    if ro == 1
+        camorbit(0.3, 0);
+    end
     drawnow limitrate; 
 % 
+end
 end
 
 
@@ -253,7 +236,7 @@ xlabel('Time (s)');
 ylabel('Torque / Force');
 grid on;
 
-legend({'P','R1','R2','R3'}, ...
+legend({'R3','R2','R1','P'}, ...
        'Location','southoutside', ...
        'Orientation','horizontal');
 subplot(3,1,2);
@@ -263,7 +246,7 @@ xlabel('Time (s)');
 ylabel('Torque / Force');
 grid on;
 
-legend({'P','R1','R2','R3'}, ...
+legend({'R3','R2','R1','P'}, ...
        'Location','southoutside', ...
        'Orientation','horizontal');
 subplot(3,1,3);
@@ -273,7 +256,7 @@ xlabel('Time (s)');
 ylabel('Torque / Force');
 grid on;
 
-legend({'P','R1','R2','R3'}, ...
+legend({'R3','R2','R1','P'}, ...
        'Location','southoutside', ...
        'Orientation','horizontal');
 
@@ -352,24 +335,24 @@ disp('===== STATIC TORQUE ([Fx Fy Fz]) =====');
 
 % --- X-leg ---
 disp('--- X-leg (Joint0 = P, Joint1-3 = R) ---');
-disp([' τX0 (P)  = ', num2str(TauX(1,end)), '   N']);
-disp([' τX1 (R1) = ', num2str(TauX(2,end)), '   N·m']);
-disp([' τX2 (R2) = ', num2str(TauX(3,end)), '   N·m']);
-disp([' τX3 (R3) = ', num2str(TauX(4,end)), '   N·m']);
+disp([' τX0 (P)  = ', num2str(TauX(4,end)), '   N']);
+disp([' τX1 (R1) = ', num2str(TauX(3,end)), '   N·m']);
+disp([' τX2 (R2) = ', num2str(TauX(2,end)), '   N·m']);
+disp([' τX3 (R3) = ', num2str(TauX(1,end)), '   N·m']);
 
 % --- Y-leg ---
 disp('--- Y-leg (Joint0 = P, Joint1-3 = R) ---');
-disp([' τY0 (P)  = ', num2str(TauY(1,end)), '   N']);
-disp([' τY1 (R1) = ', num2str(TauY(2,end)), '   N·m']);
-disp([' τY2 (R2) = ', num2str(TauY(3,end)), '   N·m']);
-disp([' τY3 (R3) = ', num2str(TauY(4,end)), '   N·m']);
+disp([' τY0 (P)  = ', num2str(TauY(4,end)), '   N']);
+disp([' τY1 (R1) = ', num2str(TauY(3,end)), '   N·m']);
+disp([' τY2 (R2) = ', num2str(TauY(2,end)), '   N·m']);
+disp([' τY3 (R3) = ', num2str(TauY(1,end)), '   N·m']);
 
 % --- Z-leg ---
 disp('--- Z-leg (Joint0 = P, Joint1-3 = R) ---');
-disp([' τZ0 (P)  = ', num2str(TauZ(1,end)), '   N']);
-disp([' τZ1 (R1) = ', num2str(TauZ(2,end)), '   N·m']);
-disp([' τZ2 (R2) = ', num2str(TauZ(3,end)), '   N·m']);
-disp([' τZ3 (R3) = ', num2str(TauZ(4,end)), '   N·m']);
+disp([' τZ0 (P)  = ', num2str(TauZ(4,end)), '   N']);
+disp([' τZ1 (R1) = ', num2str(TauZ(3,end)), '   N·m']);
+disp([' τZ2 (R2) = ', num2str(TauZ(2,end)), '   N·m']);
+disp([' τZ3 (R3) = ', num2str(TauZ(1,end)), '   N·m']);
 
 disp(' ');
 disp('===================================');
