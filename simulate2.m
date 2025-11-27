@@ -75,9 +75,11 @@ for i = 1:length(t)
     thetaZ2 = q2z;
     thetaZ3 = q3z;
 end
+
 qx = [rad2deg(q1x(1)),rad2deg(q1x(300)),rad2deg(q2x(1)),rad2deg(q2x(300)),rad2deg(q3x(1)),rad2deg(q3x(300))];
 qy = [rad2deg(q1y(1)),rad2deg(q1y(300)),rad2deg(q2y(1)),rad2deg(q2y(300)),rad2deg(q3y(1)),rad2deg(q3y(300))];
 qz = [rad2deg(q1z(1)),rad2deg(q1z(300)),rad2deg(q2z(1)),rad2deg(q2z(300)),rad2deg(q3z(1)),rad2deg(q3z(300))];
+
 % Setup figure
 figure('Color','white');
 hold on; grid on; axis equal;
@@ -193,7 +195,7 @@ for k = 1:length(t)
 
 
 
-    % camorbit(0.3, 0);
+    camorbit(0.3, 0);
     drawnow limitrate; 
 % 
 end
