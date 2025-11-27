@@ -207,9 +207,9 @@ end
 dt = t(300) - t(1); %% เวลา
 
 % Actuator speeds
-VX = New_dx-dx / dt;
-VY = New_dy-dy / dt;
-VZ = New_dz-dz / dt;
+VX = (New_dx - dx) / dt;
+VY = (New_dy - dy) / dt;
+VZ = (New_dz - dz) / dt;
 
 
 % EE position from each leg
@@ -219,26 +219,64 @@ for k = 1:length(t)
 end
 
 % EE Velocity for each axis
-vEE_x = diff(EE(2,:)) / dt;
-vEE_y = diff(EE(1,:)) / dt;
+vEE_x = diff(EE(1,:)) / dt;
+vEE_y = diff(EE(2,:)) / dt;
 vEE_z = diff(EE(3,:)) / dt;
+
 
 vEE_total = vecnorm(diff(EE,1,2)) / dt;
 
 TauZ = zeros(4,300);
 TauX = zeros(4,300);
 TauY = zeros(4,300);
-% Jacobian & static force
+
 for k = 1:length(t)
 
-Jz_full = jacobian_Z_full(L1,L2,L3,thetaZ1(k),thetaZ2(k),thetaZ3(k));
-Jx_full = jacobian_X_full(L1,L2,L3,thetaX1(k),thetaX2(k),thetaX3(k));
-Jy_full = jacobian_Y_full(L1,L2,L3,thetaY1(k),thetaY2(k),thetaY3(k));
+    Jz_full = jacobian_Z_full(L1,L2,L3,thetaZ1(k),thetaZ2(k),thetaZ3(k));
+    Jx_full = jacobian_X_full(L1,L2,L3,thetaX1(k),thetaX2(k),thetaX3(k));
+    Jy_full = jacobian_Y_full(L1,L2,L3,thetaY1(k),thetaY2(k),thetaY3(k));
 
-TauZ(:,k) = Jz_full' * W;
-TauX(:,k) = Jx_full' * W;
-TauY(:,k) = Jy_full' * W;
+    TauZ(:,k) = Jz_full' * F;
+    TauX(:,k) = Jx_full' * F;
+    TauY(:,k) = Jy_full' * F;
+
 end
+
+
+
+%% ===== graph torque =====
+figure;
+subplot(3,1,1);
+plot(t, TauX','LineWidth',1.5); 
+title('X-leg Joint Forces/Torques','FontSize',12);
+xlabel('Time (s)'); 
+ylabel('Torque / Force');
+grid on;
+
+legend({'P','R1','R2','R3'}, ...
+       'Location','southoutside', ...
+       'Orientation','horizontal');
+subplot(3,1,2);
+plot(t, TauY','LineWidth',1.5); 
+title('Y-leg Joint Forces/Torques','FontSize',12);
+xlabel('Time (s)'); 
+ylabel('Torque / Force');
+grid on;
+
+legend({'P','R1','R2','R3'}, ...
+       'Location','southoutside', ...
+       'Orientation','horizontal');
+subplot(3,1,3);
+plot(t, TauZ','LineWidth',1.5); 
+title('Z-leg Joint Forces/Torques','FontSize',12);
+xlabel('Time (s)'); 
+ylabel('Torque / Force');
+grid on;
+
+legend({'P','R1','R2','R3'}, ...
+       'Location','southoutside', ...
+       'Orientation','horizontal');
+
 
 
 %% ================= DISPLAY RESULTS (FULL REPORT WITH UNITS) =================
@@ -259,9 +297,6 @@ disp('===== INPUT FORCE / WRENCH PARAMETERS =====');
 disp(['Fx = ', num2str(Fx), '   N']);
 disp(['Fy = ', num2str(Fy), '   N']);
 disp(['Fz = ', num2str(Fz), '   N']);
-disp(['Mx = ', num2str(Mx), '   N·m']);
-disp(['My = ', num2str(My), '   N·m']);
-disp(['Mz = ', num2str(Mz), '   N·m']);
 disp(' ');
 
 disp('===== INPUT ACTUATOR POSITION (START → END) =====');
@@ -299,8 +334,8 @@ disp(' ');
 disp('===== VELOCITY RESULTS =====');
 disp('--- EE VELOCITY (avg) ---');
 disp(['v_EE_x = ', num2str(mean(abs(vEE_x))), '   m/s']);
-disp(['v_EE_y = ', num2str(mean(abs(vEE_y))), '   m/s']);
 disp(['v_EE_z = ', num2str(mean(abs(vEE_z))), '   m/s']);
+disp(['v_EE_y = ', num2str(mean(abs(vEE_y))), '   m/s']);
 disp(['v_EE_total = ', num2str(mean(abs(vEE_total))), '   m/s']);
 
 disp(' ');
@@ -310,32 +345,31 @@ disp(['Actuator Y = ', num2str(abs(VY)), '   m/s']);
 disp(['Actuator Z = ', num2str(abs(VZ)), '   m/s']);
 
 %% ---------------------------------------------
-% 4) STATIC TORQUE FROM WRENCH
+% 4) STATIC TORQUE FROM FORCE F (FINAL STATE)
 %% ---------------------------------------------
 disp(' ');
-disp('===== STATIC TORQUE (from W = [Fx Fy Fz Mx My Mz]) =====');
-disp('Units: Newton-meter (N·m)');
+disp('===== STATIC TORQUE ([Fx Fy Fz]) =====');
 
-%% Z-leg torque 
-disp('--- Z-leg (Joint0 = P, Joint1-3 = R) ---');
-disp([' τZ0 (P)  = ', num2str(TauZ(4,k)), '   N·m']);
-disp([' τZ1 (R1) = ', num2str(TauZ(3,k)), '   N·m']);
-disp([' τZ2 (R2) = ', num2str(TauZ(2,k)), '   N·m']);
-disp([' τZ3 (R3) = ', num2str(TauZ(1,k)), '   N·m']);
-
-%% X-leg torque
+% --- X-leg ---
 disp('--- X-leg (Joint0 = P, Joint1-3 = R) ---');
-disp([' τX0 (P)  = ', num2str(TauX(4,k)), '   N·m']);
-disp([' τX1 (R1) = ', num2str(TauX(3,k)), '   N·m']);
-disp([' τX2 (R2) = ', num2str(TauX(2,k)), '   N·m']);
-disp([' τX3 (R3) = ', num2str(TauX(1,k)), '   N·m']);
+disp([' τX0 (P)  = ', num2str(TauX(1,end)), '   N']);
+disp([' τX1 (R1) = ', num2str(TauX(2,end)), '   N·m']);
+disp([' τX2 (R2) = ', num2str(TauX(3,end)), '   N·m']);
+disp([' τX3 (R3) = ', num2str(TauX(4,end)), '   N·m']);
 
-%% Y-leg torque
+% --- Y-leg ---
 disp('--- Y-leg (Joint0 = P, Joint1-3 = R) ---');
-disp([' τY0 (P)  = ', num2str(TauY(4,k)), '   N·m']);
-disp([' τY1 (R1) = ', num2str(TauY(3,k)), '   N·m']);
-disp([' τY2 (R2) = ', num2str(TauY(2,k)), '   N·m']);
-disp([' τY3 (R3) = ', num2str(TauY(1,k)), '   N·m']);
+disp([' τY0 (P)  = ', num2str(TauY(1,end)), '   N']);
+disp([' τY1 (R1) = ', num2str(TauY(2,end)), '   N·m']);
+disp([' τY2 (R2) = ', num2str(TauY(3,end)), '   N·m']);
+disp([' τY3 (R3) = ', num2str(TauY(4,end)), '   N·m']);
+
+% --- Z-leg ---
+disp('--- Z-leg (Joint0 = P, Joint1-3 = R) ---');
+disp([' τZ0 (P)  = ', num2str(TauZ(1,end)), '   N']);
+disp([' τZ1 (R1) = ', num2str(TauZ(2,end)), '   N·m']);
+disp([' τZ2 (R2) = ', num2str(TauZ(3,end)), '   N·m']);
+disp([' τZ3 (R3) = ', num2str(TauZ(4,end)), '   N·m']);
 
 disp(' ');
 disp('===================================');
