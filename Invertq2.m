@@ -8,7 +8,12 @@ function q2 = Invertq2(L1, L2, L3, px, py,angle)
       sinB = sqrt(1 - cosB^2);
       % sinB2 = -sqrt(1 - cosB^2);
 
-      q2 = atan2(sinB , cosB);
+      ck = atan2(sinB , cosB);
+      if ck > 0 | ck < pi  
+          q2 = atan2(-sinB , cosB);
+      else
+          q2 = ck;
+      end
       % r_2 = atan2(sinB2 , cosB);
 
       % if r_1 > 1.5708 || r_1 < -1.5708
