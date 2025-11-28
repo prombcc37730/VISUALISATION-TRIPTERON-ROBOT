@@ -33,9 +33,11 @@ Full Jacobian (6×4) ของแต่ละขา สำหรับคำน�
 
 **4. Simulation Scripts**  
 - `simulate2.m` —
+
 #การทดสอบ
 ดาวโหลดไฟล์แล้วเปิด floder ในโปรแกรม MATLAB
 เปิดไฟล์ - `simulate2.m` — แล้วรัน
+
 
 
 
