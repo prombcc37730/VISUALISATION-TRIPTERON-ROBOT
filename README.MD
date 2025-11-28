@@ -5,7 +5,7 @@
 ประกอบด้วยการพัฒนา Inverse Kinematics, Forward Kinematics, Jacobian Matrix  
 และการนำมาจำลองการเคลื่อนที่ของ End-Effector พร้อมแสดงผลแบบ Animation
 
-รายละเอียดวิธีการทฤษฎีและสมการทั้งหมดสามารถดูได้จากไฟล์รายงาน - `Kinematic_Proposal_Template.pdf`
+รายละเอียดวิธีการทฤษฎีและสมการทั้งหมดสามารถดูได้จากไฟล์รายงาน - `Final_Report_6625_6649.pdf`
 ส่วน README นี้สรุปเฉพาะภาพรวมโค้ดและวิธีใช้งาน
 
 #โครงสร้างไฟล์ (File Structure)
@@ -37,6 +37,7 @@ Full Jacobian (6×4) ของแต่ละขา สำหรับคำน�
 #การทดสอบ
 ดาวโหลดไฟล์แล้วเปิด floder ในโปรแกรม MATLAB
 เปิดไฟล์ - `simulate2.m` — แล้วรัน
+
 
 
 
