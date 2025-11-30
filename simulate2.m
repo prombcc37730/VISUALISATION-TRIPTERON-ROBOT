@@ -8,10 +8,10 @@ L3 = 0.5;
 dx = 2.5;
 dy = 2.5;
 dz = 2.5;
-New_dx = 4.5;
-New_dy = 0;
+New_dx = 4;
+New_dy = 4;
 New_dz = 4;
-simulate = 1;
+simulate = 0;
 ro = 0;
 %recomendation workspace
 % 0.5 < dx < 4.5
@@ -356,3 +356,18 @@ disp([' τZ3 (R3) = ', num2str(TauZ(1,end)), '   N·m']);
 
 disp(' ');
 disp('===================================');
+
+
+V1x = q1x(300) -q1x(1);
+V2x = q2x(300) -q2x(1);
+V3x = q2x(300) -q3x(1);
+V1y = q1y(300) -q1y(1);
+V2y = q2y(300) -q2y(1);
+V3y = q2y(300) -q3y(1);
+V1z = q1z(300) -q1z(1);
+V2z = q2z(300) -q2z(1);
+V3z = q2z(300) -q3z(1);
+
+velocityx = Jx_full*[(mean(abs(vEE_x)));V3x;V2x;V1x]
+velocityy = Jy_full*[(mean(abs(vEE_y)));V3y;V2y;V1y]
+velocityz = Jz_full*[(mean(abs(vEE_z)));V3z;V2z;V1z]
