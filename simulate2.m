@@ -20,7 +20,7 @@ ro = 0;
 % ส่วนstatic ดูแรง
 Fx =10;
 Fy =10;
-Fz =10;
+Fz =0;
 F = [Fx; Fy; Fz];
 t = linspace(0, 6, 300);
 
@@ -202,9 +202,9 @@ for k = 1:length(t)
 end
 
 % EE Velocity for each axis
-vEE_x = diff(EE(1,:)) / dt;
-vEE_y = diff(EE(2,:)) / dt;
-vEE_z = diff(EE(3,:)) / dt;
+vEE_x = VX;
+vEE_y = VY;
+vEE_z = VZ;
 
 
 vEE_total = vecnorm(diff(EE,1,2)) / dt;
@@ -368,6 +368,6 @@ V1z = q1z(300) -q1z(1);
 V2z = q2z(300) -q2z(1);
 V3z = q2z(300) -q3z(1);
 
-velocityx = Jx_full*[(mean(abs(vEE_x)));V3x;V2x;V1x]
-velocityy = Jy_full*[(mean(abs(vEE_y)));V3y;V2y;V1y]
-velocityz = Jz_full*[(mean(abs(vEE_z)));V3z;V2z;V1z]
+velocityx = Jx_full*[(mean(abs(vEE_x)));V3x;V2x;V1x];
+velocityy = Jy_full*[(mean(abs(vEE_y)));V3y;V2y;V1y];
+velocityz = Jz_full*[(mean(abs(vEE_z)));V3z;V2z;V1z];
